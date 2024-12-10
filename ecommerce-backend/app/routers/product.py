@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
-from app.models.product import Product, ProductInDB
-from app.crud.product import create_product, get_product_by_id, get_all_products, update_product, delete_product
+from app.models.product import Product, ProductFilter, ProductInDB
+from app.crud.product import create_product, get_product_by_id, get_all_products, search_products, update_product, delete_product
 from app.utils.security import get_current_user
 
 router = APIRouter()
@@ -45,3 +45,8 @@ async def remove_product(product_id: str, current_user: dict = Depends(get_curre
     if not success:
         raise HTTPException(status_code=404, detail="Product not found")
     return {"msg": "Product deleted successfully"}
+
+@router.post("/products/search", response_model=list[ProductInDB])
+async def search_for_products(filters: ProductFilter, current_user: dict = Depends(get_current_user)):
+    """Search and filter products based on criteria."""
+    return await search_products(filters)

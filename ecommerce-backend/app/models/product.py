@@ -12,3 +12,10 @@ class Product(BaseModel):
 class ProductInDB(Product):
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
+
+class ProductFilter(BaseModel):
+    name: Optional[str] = None
+    min_price: Optional[float] = None
+    max_price: Optional[float] = None
+    min_stock: Optional[int] = None
+    max_stock: Optional[int] = None
