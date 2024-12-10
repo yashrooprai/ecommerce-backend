@@ -1,9 +1,30 @@
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from jose import jwt, JWTError
+from fastapi import HTTPException, Depends, Request
+from fastapi.security import OAuth2PasswordBearer
 
 SECRET_KEY = "700007"  # Replace with a secure random key
 ALGORITHM = "HS256"  # Hashing algorithm
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
+
+def get_current_user(request: Request) -> dict:
+    """Get the current user by verifying the JWT token from cookies."""
+    token = request.cookies.get("access_token")  # Extract token from cookies
+    if token is None:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    try:
+        # Decode the token
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = payload.get("sub")
+        if user_id is None:
+            raise HTTPException(status_code=401, detail="Invalid token")
+        return {"user_id": user_id}
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
 
 def create_access_token(data: dict, expires_delta: timedelta = timedelta(minutes=30)) -> str:
     """Generate a JWT token."""

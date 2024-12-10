@@ -1,3 +1,4 @@
+from bson import ObjectId
 from app.database import db, to_dict
 from app.models.user import UserinDB
 
@@ -14,4 +15,11 @@ async def get_user_by_email(email: str):
         return to_dict(user)
     else:
         return None
-    
+
+async def get_user_by_id(user_id: str):
+    """Find a user by their user_id."""
+    user = await db.users.find_one({"_id": ObjectId(user_id)})
+    if user:
+        return to_dict(user)
+    else:
+        return None
